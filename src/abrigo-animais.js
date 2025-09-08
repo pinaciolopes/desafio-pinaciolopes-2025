@@ -1,145 +1,108 @@
 class AbrigoAnimais {
   animais = {
-    'Rex': { tipo: 'cão', brinquedo: ['RATO', 'BOLA'] },
-    'Mimi': { tipo: 'gato', brinquedo: ['BOLA', 'LASER'] },
-    'Fofo': { tipo: 'gato', brinquedo: ['BOLA', 'RATO', 'LASER'] },
-    'Zero': { tipo: 'gato', brinquedo: ['RATO', 'BOLA'] },
-    'Bola': { tipo: 'cão', brinquedo: ['CAIXA', 'NOVELO'] },
-    'Bebe': { tipo: 'cão', brinquedo: ['LASER', 'RATO', 'BOLA'] },
-    'Loco': { tipo: 'jabuti', brinquedo: ['SKATE', 'RATO'] }
+    Rex: { tipo: 'cachorro', brinquedos: ['RATO', 'BOLA'] },
+    Mimi: { tipo: 'gato', brinquedos: ['BOLA', 'LASER'] },
+    Fofo: { tipo: 'gato', brinquedos: ['BOLA', 'RATO', 'LASER'] },
+    Zero: { tipo: 'gato', brinquedos: ['RATO', 'BOLA'] },
+    Bola: { tipo: 'cachorro', brinquedos: ['CAIXA', 'NOVELO'] },
+    Bebe: { tipo: 'cachorro', brinquedos: ['LASER', 'RATO', 'BOLA'] },
+    Loco: { tipo: 'jabuti', brinquedos: ['SKATE', 'RATO'] }
   };
 
   nome_animal_valido = Object.keys(this.animais);
   brinquedo_valido = new Set(['RATO', 'BOLA', 'LASER', 'CAIXA', 'NOVELO', 'SKATE']);
 
-  checkMatch(brinquedosPessoas, brinquedosAnimais, tipoAnimal) {
-    if (tipoAnimal === 'jabuti') {
-      const brinquedosAnimaisSet = new Set(brinquedosAnimais);
-      const brinquedosPessoasSet = new Set(brinquedosPessoas);
-      for (const brinquedo of brinquedosAnimaisSet) {
-        if (!brinquedosPessoasSet.has(brinquedo)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    let brinquedoIndice = 0;
-    for (let i = 0; i < brinquedosPessoas.length; i++) {
-      if (brinquedosPessoas[i] === brinquedosAnimais[brinquedoIndice]) {
-        brinquedoIndice++;
-      }
-    }
-
-    const brinquedosOrdem = brinquedoIndice === brinquedosAnimais.length;
-
-    if (tipoAnimal === 'gato') {
-      const todosBrinquedosAnimaisSet = new Set(brinquedosAnimais);
-      const todosBrinquedosOrdem = brinquedosAnimais.every(brinquedo => todosBrinquedosAnimaisSet.has(brinquedo));
-      return brinquedosOrdem && todosBrinquedosOrdem;
-    }
-
-    return brinquedosOrdem;
-  }
-
   possuiDuplicidade(list) {
-    const itensUnico = new Set(list);
-    return itensUnico.size !== list.length;
+    return new Set(list).size !== list.length;
   }
 
-  encontraPessoas(pessoa1Brinquedos, pessoa2Brinquedos, ordemAnimais) {
+  checkMatch(brinquedosPessoa, brinquedosAnimal, tipo) {
+    if (tipo === 'jabuti') {
+      return brinquedosAnimal.every(b => brinquedosPessoa.includes(b));
+    }
+
+    let idx = 0;
+    for (let b of brinquedosPessoa) {
+      if (b === brinquedosAnimal[idx]) idx++;
+      if (idx === brinquedosAnimal.length) break;
+    }
+
+    if (tipo === 'gato') {
+      return idx === brinquedosAnimal.length && brinquedosPessoa.length === brinquedosAnimal.length;
+    }
+
+    return idx === brinquedosAnimal.length;
+  }
+
+  encontraPessoas(pessoa1Brinquedos = '', pessoa2Brinquedos = '', ordemAnimais = '') {
     try {
-      const brinquedo1 = pessoa1Brinquedos.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
-      const brinquedo2 = pessoa2Brinquedos.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
-      const animalOrder = ordemAnimais.split(',').map(a => a.trim()).filter(a => a);
+      const p1 = pessoa1Brinquedos.split(',').map(b => b.trim().toUpperCase()).filter(b => b);
+      const p2 = pessoa2Brinquedos.split(',').map(b => b.trim().toUpperCase()).filter(b => b);
+      const ordem = ordemAnimais.split(',').map(a => a.trim()).filter(a => a);
 
-      const todosBrinquedos = [...brinquedo1, ...brinquedo2];
-      const todosAnimais = [...animalOrder];
-
-      if (todosBrinquedos.some(brinquedos => !this.brinquedo_valido.has(brinquedos))) {
-        return { erro: 'Brinquedo inválido' };
-      }
-      if (this.possuiDuplicidade(brinquedo1) || this.possuiDuplicidade(brinquedo2)) {
+      if (p1.some(b => !this.brinquedo_valido.has(b)) || p2.some(b => !this.brinquedo_valido.has(b))) {
         return { erro: 'Brinquedo inválido' };
       }
 
-      if (todosAnimais.some(animal => !this.nome_animal_valido.includes(animal))) {
+      if (this.possuiDuplicidade(p1) || this.possuiDuplicidade(p2)) {
+        return { erro: 'Brinquedo inválido' };
+      }
+
+      if (ordem.some(a => !this.nome_animal_valido.includes(a))) {
         return { erro: 'Animal inválido' };
       }
-      if (this.possuiDuplicidade(animalOrder)) {
+
+      if (this.possuiDuplicidade(ordem)) {
         return { erro: 'Animal inválido' };
       }
 
       const adocoes = {};
-      let quantidadeAdocoesPessoa1 = 0;
-      let quantidadeAdocoesPessoa2 = 0;
-      let locoAdotadoPor = null;
+      let qtdP1 = 0;
+      let qtdP2 = 0;
 
-      for (const nomeAnimal of animalOrder) {
-        const animal = this.animais[nomeAnimal];
-        let correspondePessoa1 = false;
-        let correspondePessoa2 = false;
+      for (let nome of ordem) {
+        const animal = this.animais[nome];
+        let p1Match = this.checkMatch(p1, animal.brinquedos, animal.tipo);
+        let p2Match = this.checkMatch(p2, animal.brinquedos, animal.tipo);
 
-        if (animal.tipo === 'jabuti') {
-          correspondePessoa1 = this.checkMatch(brinquedo1, animal.brinquedo, animal.tipo);
-          correspondePessoa2 = this.checkMatch(brinquedo2, animal.brinquedo, animal.tipo);
-        } else {
-          correspondePessoa1 = this.checkMatch(brinquedo1, animal.brinquedo, animal.tipo);
-          correspondePessoa2 = this.checkMatch(brinquedo2, animal.brinquedo, animal.tipo);
-        }
-
-        if (correspondePessoa1 && correspondePessoa2) {
-          adocoes[nomeAnimal] = 'abrigo';
-        } else if (correspondePessoa1) {
-          adocoes[nomeAnimal] = 'pessoa 1';
-          if (nomeAnimal === 'Loco') {
-            locoAdotadoPor = 'pessoa 1';
+        if (p1Match && p2Match) {
+          adocoes[nome] = 'abrigo';
+        } else if (p1Match) {
+          adocoes[nome] = 'pessoa 1';
+          qtdP1++;
+        } else if (p2Match) {
+          adocoes[nome] = 'pessoa 2';
+          qtdP2++;
+        } else if (animal.tipo === 'jabuti') {
+          if (ordem.length > 1) {
+            adocoes[nome] = 'pessoa 1';
+            qtdP1++;
           } else {
-            quantidadeAdocoesPessoa1++;
-          }
-        } else if (correspondePessoa2) {
-          adocoes[nomeAnimal] = 'pessoa 2';
-          if (nomeAnimal === 'Loco') {
-            locoAdotadoPor = 'pessoa 2';
-          } else {
-            quantidadeAdocoesPessoa2++;
+            adocoes[nome] = 'abrigo';
           }
         } else {
-          adocoes[nomeAnimal] = 'abrigo';
+          adocoes[nome] = 'abrigo';
         }
       }
 
-      if (locoAdotadoPor === 'pessoa 1' && quantidadeAdocoesPessoa1 > 0) {
-        quantidadeAdocoesPessoa1++;
-      } else if (locoAdotadoPor === 'pessoa 2' && quantidadeAdocoesPessoa2 > 0) {
-        quantidadeAdocoesPessoa2++;
-      } else if (locoAdotadoPor) {
-        adocoes['Loco'] = 'abrigo';
-      }
-
-      if (quantidadeAdocoesPessoa1 > 3) {
-        for (const nomeAnimal in adocoes) {
-          if (adocoes[nomeAnimal] === 'pessoa 1') {
-            adocoes[nomeAnimal] = 'abrigo';
-          }
+      if (qtdP1 > 3) {
+        for (let nome in adocoes) {
+          if (adocoes[nome] === 'pessoa 1') adocoes[nome] = 'abrigo';
         }
       }
-      if (quantidadeAdocoesPessoa2 > 3) {
-        for (const nomeAnimal in adocoes) {
-          if (adocoes[nomeAnimal] === 'pessoa 2') {
-            adocoes[nomeAnimal] = 'abrigo';
-          }
+
+      if (qtdP2 > 3) {
+        for (let nome in adocoes) {
+          if (adocoes[nome] === 'pessoa 2') adocoes[nome] = 'abrigo';
         }
       }
 
       const listaResultado = Object.keys(adocoes)
         .sort()
-        .map(animal => `${animal} - ${adocoes[animal]}`);
+        .map(a => `${a} - ${adocoes[a]}`);
 
       return { lista: listaResultado };
-
     } catch (e) {
-      console.error(e);
       return { erro: 'Ocorreu um erro interno.' };
     }
   }
