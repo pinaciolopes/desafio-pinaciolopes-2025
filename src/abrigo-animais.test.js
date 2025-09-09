@@ -2,6 +2,11 @@ import { AbrigoAnimais } from "./abrigo-animais";
 
 describe('Abrigo de Animais', () => {
 
+  let abrigo;
+  beforeEach(() => {
+    abrigo = new AbrigoAnimais();
+  });
+
   test('Deve rejeitar animal inválido', () => {
     const resultado = new AbrigoAnimais().encontraPessoas('CAIXA,RATO', 'RATO,BOLA', 'Lulu');
     expect(resultado.erro).toBe('Animal inválido');
@@ -27,11 +32,6 @@ describe('Abrigo de Animais', () => {
       expect(resultado.lista[3]).toBe('Rex - abrigo');
       expect(resultado.lista.length).toBe(4);
       expect(resultado.erro).toBeFalsy();
-  });
-
-  let abrigo;
-  beforeEach(() => {
-    abrigo = new AbrigoAnimais();
   });
 
   test('Deve rejeitar animal duplicado', () => {

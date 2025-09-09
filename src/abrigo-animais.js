@@ -20,17 +20,14 @@ class AbrigoAnimais {
     if (tipo === 'jabuti') {
       return brinquedosAnimal.every(b => brinquedosPessoa.includes(b));
     }
-
     let idx = 0;
     for (let b of brinquedosPessoa) {
       if (b === brinquedosAnimal[idx]) idx++;
       if (idx === brinquedosAnimal.length) break;
     }
-
     if (tipo === 'gato') {
       return idx === brinquedosAnimal.length && brinquedosPessoa.length === brinquedosAnimal.length;
     }
-
     return idx === brinquedosAnimal.length;
   }
 
@@ -108,4 +105,4 @@ class AbrigoAnimais {
   }
 }
 
-export { AbrigoAnimais as AbrigoAnimais };
+export { AbrigoAnimais };
